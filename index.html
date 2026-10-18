@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>География слова · Державин на карте империи</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cream: #F2ECE0;
+    --paper: #EAE3D3;
+    --ink: #2B3A4A;
+    --terracotta: #C84630;
+    --ochre: #D4A574;
+    --sand: #D9CDB4;
+    --white: #FAF7F0;
+    --deep: #3D4A5C;
+  }
+  body {
+    font-family: 'PT Sans', 'Arial', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--white);
+    padding: 70px 40px 90px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--ink);
+  }
+  /* Мягкие геометрические фигуры */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    background: var(--terracotta);
+    opacity: 0.15;
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    background: var(--ochre);
+    opacity: 0.25;
+    transform: rotate(45deg);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 50px;
+    align-items: center;
+  }
+  
+  /* Портрет Державина — геометрический, но мягкий */
+  .portrait-frame {
+    width: 260px;
+    height: 300px;
+    margin: 0 auto;
+    position: relative;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+  }
+  .portrait-frame::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid var(--ink);
+    pointer-events: none;
+  }
+  .portrait-frame::after {
+    content: '1743—1816';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9em;
+    letter-spacing: 0.2em;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .portrait-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-text h1 {
+    font-size: 4em;
+    line-height: 0.95;
+    color: var(--ink);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .hero-text h1 span {
+    color: var(--terracotta);
+    display: block;
+  }
+  .hero-text h1::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--terracotta);
+    margin-top: 15px;
+  }
+  .hero .subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.3em;
+    color: var(--deep);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+  }
+  .hero .epigraph {
+    font-style: italic;
+    font-size: 1.15em;
+    max-width: 500px;
+    margin: 25px 0;
+    color: var(--ink);
+    padding-left: 20px;
+    border-left: 4px solid var(--terracotta);
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 14px 40px;
+    background: var(--ink);
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    position: relative;
+  }
+  .btn:hover {
+    background: var(--terracotta);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+  }
+  .btn-outline:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  /* ===== PROBLEM ===== */
+  .problem {
+    background: var(--paper);
+    padding: 70px 40px;
+    position: relative;
+    border-bottom: 4px solid var(--ink);
+  }
+  .problem-header {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .problem-header .label {
+    background: var(--terracotta);
+    color: var(--white);
+    padding: 8px 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1em;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .problem h2 {
+    font-size: 2.5em;
+    text-transform: uppercase;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .problem-intro {
+    max-width: 800px;
+    margin: 0 auto 40px;
+    font-size: 1.15em;
+    text-align: center;
+    color: var(--deep);
+  }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .problem-card {
+    background: var(--white);
+    padding: 30px;
+    border: 2px solid var(--ink);
+    position: relative;
+  }
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--terracotta);
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+  .problem-card .number {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2em;
+    color: var(--white);
+    font-weight: 600;
+    z-index: 2;
+  }
+  .problem-card h3 {
+    font-size: 1.5em;
+    margin: 20px 0 15px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .problem-card p {
+    font-size: 1.05em;
+    color: var(--deep);
+  }
+
+  /* ===== MAP ===== */
+  .map-section {
+    padding: 70px 40px;
+    background: var(--white);
+    position: relative;
+    border-bottom: 4px solid var(--ink);
+  }
+  .map-section h2 {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .map-section h2::before,
+  .map-section h2::after {
+    content: '◆';
+    color: var(--terracotta);
+    font-size: 0.5em;
+    vertical-align: middle;
+    margin: 0 15px;
+  }
+  .map-intro {
+    text-align: center;
+    font-size: 1.15em;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    color: var(--deep);
+  }
+  #map {
+    height: 550px;
+    border: 3px solid var(--ink);
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+  #map::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: -8px; right: -8px; bottom: -8px;
+    border: 1px solid var(--ink);
+    pointer-events: none;
+    z-index: 400;
+  }
+  .card {
+    background: var(--white);
+    border: 2px solid var(--ink);
+    padding: 30px;
+    margin: 40px auto 0;
+    max-width: 900px;
+    position: relative;
+    display: none;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--terracotta);
+  }
+  .card.active { display: block; }
+  .card h3 {
+    font-size: 2.2em;
+    color: var(--ink);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .card .year {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1em;
+    color: var(--terracotta);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .card .label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85em;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--deep);
+    margin-bottom: 8px;
+    margin-top: 15px;
+  }
+  .card .story {
+    margin-bottom: 15px;
+    font-size: 1.05em;
+    color: var(--ink);
+  }
+  .card .quote {
+    background: var(--paper);
+    padding: 20px 25px;
+    margin: 20px 0;
+    font-style: italic;
+    font-size: 1.15em;
+    border-left: 5px solid var(--terracotta);
+    color: var(--ink);
+  }
+  .card .task {
+    background: var(--sand);
+    padding: 18px 22px;
+    border: 2px solid var(--ink);
+    font-size: 1em;
+  }
+  .card .task b {
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    color: var(--terracotta);
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  /* ===== QUIZ ===== */
+  .quiz {
+    background: var(--paper);
+    padding: 70px 40px;
+    position: relative;
+    border-bottom: 4px solid var(--ink);
+  }
+  .quiz h2 {
+    font-size: 2.8em;
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .quiz-intro {
+    text-align: center;
+    font-size: 1.15em;
+    margin-bottom: 40px;
+    color: var(--deep);
+  }
+  .quiz-question {
+    background: var(--white);
+    padding: 25px 30px;
+    margin: 0 auto 20px;
+    max-width: 900px;
+    border: 2px solid var(--ink);
+    position: relative;
+  }
+  .quiz-question .q-number {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--terracotta);
+    color: var(--white);
+    padding: 3px 12px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85em;
+    letter-spacing: 0.1em;
+  }
+  .quiz-question p {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 18px;
+    margin-top: 8px;
+    color: var(--ink);
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .quiz-option {
+    display: block;
+    padding: 12px 18px;
+    margin: 8px 0;
+    background: var(--cream);
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    transition: 0.15s;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 1.05em;
+    color: var(--ink);
+  }
+  .quiz-option:hover {
+    background: var(--sand);
+    transform: translateX(5px);
+  }
+  .quiz-option.correct {
+    background: var(--terracotta);
+    color: var(--white);
+    border-color: var(--ink);
+  }
+  .quiz-option.wrong {
+    background: var(--sand);
+    color: var(--deep);
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  
+  .quiz-result {
+    background: var(--white);
+    border: 3px solid var(--ink);
+    padding: 35px;
+    margin: 40px auto 0;
+    max-width: 600px;
+    text-align: center;
+    display: none;
+    position: relative;
+  }
+  .quiz-result::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--terracotta);
+  }
+  .result-medallion {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 20px;
+    background: var(--ink);
+    color: var(--white);
+    border: 3px solid var(--terracotta);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 3em;
+    font-weight: 500;
+  }
+  .result-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    color: var(--deep);
+  }
+  .result-comment {
+    font-size: 1.1em;
+    font-style: italic;
+    color: var(--ink);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ===== TIMER ===== */
+  .timer-section {
+    background: var(--ink);
+    color: var(--white);
+    padding: 70px 40px;
+    text-align: center;
+    border-bottom: 4px solid var(--terracotta);
+    position: relative;
+  }
+  .timer-section::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--terracotta);
+    opacity: 0.4;
+    transform: rotate(45deg);
+  }
+  .timer-section::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--ochre);
+    opacity: 0.4;
+  }
+  .timer-section h2 {
+    font-size: 2.5em;
+    color: var(--white);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .timer-section h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--terracotta);
+    margin: 15px auto 0;
+  }
+  .timer-intro {
+    font-size: 1.1em;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    color: var(--sand);
+    position: relative;
+  }
+  .timer-display {
+    font-family: 'Oswald', sans-serif;
+    font-size: 6em;
+    color: var(--ochre);
+    margin: 20px 0;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+  .timer-quote {
+    font-style: italic;
+    font-size: 1.2em;
+    max-width: 700px;
+    margin: 20px auto;
+    min-height: 80px;
+    background: var(--deep);
+    color: var(--white);
+    padding: 20px 25px;
+    border-left: 5px solid var(--terracotta);
+    text-align: left;
+    position: relative;
+  }
+  .timer-section .btn {
+    background: var(--terracotta);
+    color: var(--white);
+  }
+  .timer-section .btn:hover {
+    background: var(--ochre);
+    color: var(--ink);
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--paper);
+    color: var(--ink);
+    text-align: center;
+    padding: 50px 40px 40px;
+    border-top: 4px solid var(--ink);
+    position: relative;
+  }
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--terracotta);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  footer h3 {
+    font-size: 1.6em;
+    margin: 30px 0 15px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  footer p { margin: 6px 0; font-size: 1em; color: var(--deep); }
+  footer .subjects {
+    margin-top: 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1em;
+    color: var(--terracotta);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  /* ===== LEAFLET CUSTOM ===== */
+  .leaflet-popup-content-wrapper {
+    background: var(--white);
+    color: var(--ink);
+    border-radius: 0;
+    border: 2px solid var(--ink);
+    font-family: 'PT Sans', sans-serif;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .leaflet-popup-content {
+    font-size: 0.95em;
+    margin: 12px 15px;
+  }
+  .leaflet-popup-content b {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2em;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .leaflet-popup-tip { background: var(--white); border: 1px solid var(--ink); }
+  .leaflet-popup-close-button { color: var(--ink) !important; }
+
+  @media (max-width: 768px) {
+    .hero-content { grid-template-columns: 1fr; }
+    .portrait-frame { width: 200px; height: 230px; }
+    .hero-text h1 { font-size: 2.8em; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .map-section h2, .quiz h2, .timer-section h2, .problem h2 { font-size: 2em; }
+    .timer-display { font-size: 4em; }
+    .problem-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <p class="subtitle">Интерактивный проект</p>
+      <h1>География<span>Слова</span></h1>
+      <p class="epigraph">
+        «Я памятник себе воздвиг чудесный, вечный...<br>
+        Слух обо мне пройдёт по всей Руси великой»
+      </p>
+      <a href="#map-section" class="btn">Открыть карту →</a>
+    </div>
+    
+    <!-- Геометрический портрет Державина -->
+    <div class="portrait-frame">
+      <svg class="portrait-svg" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Фон -->
+        <rect width="260" height="300" fill="#EAE3D3"/>
+        <!-- Геометрические акценты -->
+        <circle cx="210" cy="50" r="25" fill="#C84630" opacity="0.3"/>
+        <rect x="30" y="250" width="40" height="40" fill="#D4A574" opacity="0.4"/>
+        <!-- Парик — геометрический -->
+        <polygon points="80,90 70,65 90,50 110,45 130,45 150,50 170,65 180,90 185,130 175,145 165,135 160,120 155,110 145,105 130,100 115,100 100,105 90,115 85,130 80,145 70,140 75,120" fill="#3D4A5C"/>
+        <!-- Лицо -->
+        <ellipse cx="130" cy="125" rx="42" ry="50" fill="#F2ECE0"/>
+        <!-- Глаза -->
+        <rect x="113" y="118" width="10" height="6" fill="#2B3A4A"/>
+        <rect x="137" y="118" width="10" height="6" fill="#2B3A4A"/>
+        <!-- Брови -->
+        <line x1="110" y1="110" x2="125" y2="108" stroke="#2B3A4A" stroke-width="2"/>
+        <line x1="135" y1="108" x2="150" y2="110" stroke="#2B3A4A" stroke-width="2"/>
+        <!-- Нос -->
+        <line x1="130" y1="120" x2="130" y2="140" stroke="#2B3A4A" stroke-width="2"/>
+        <line x1="125" y1="140" x2="135" y2="140" stroke="#2B3A4A" stroke-width="2"/>
+        <!-- Рот -->
+        <line x1="118" y1="155" x2="142" y2="155" stroke="#C84630" stroke-width="2"/>
+        <!-- Воротник -->
+        <polygon points="85,175 80,210 100,220 130,225 160,220 180,210 175,175" fill="#FAF7F0" stroke="#2B3A4A" stroke-width="2"/>
+        <!-- Галстук -->
+        <polygon points="120,180 115,215 130,225 145,215 140,180" fill="#C84630"/>
+        <!-- Плечи -->
+        <polygon points="60,220 85,175 80,210 70,240 60,260" fill="#3D4A5C"/>
+        <polygon points="200,220 175,175 180,210 190,240 200,260" fill="#3D4A5C"/>
+        <!-- Подпись -->
+        <text x="130" y="280" text-anchor="middle" font-family="Oswald" font-size="12" fill="#2B3A4A" letter-spacing="2">Г. Р. ДЕРЖАВИН</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROBLEM ===== -->
+<section class="problem">
+  <div class="problem-header">
+    <div class="label">Проблема</div>
+    <h2>Почему мы теряем внимание на Державине?</h2>
+  </div>
+  <p class="problem-intro">
+    Оды XVIII века кажутся набором непонятных слов. Но за каждой строкой — живая страна и живая история. Без этого контекста внимание рассеивается, а классика проигрывает коротким видео.
+  </p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="number">01</div>
+      <h3>География</h3>
+      <p>За текстом — огромная империя: от Казани до Званки, от Волхова до Невы. Каждое место — источник строки.</p>
+    </div>
+    <div class="problem-card">
+      <div class="number">02</div>
+      <h3>История</h3>
+      <p>Екатерина II, французская революция, дело Радищева, губернаторские будни. Без этого текст повисает в воздухе.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAP ===== -->
+<section class="map-section" id="map-section">
+  <h2>Карта империи</h2>
+  <p class="map-intro">Кликните по точке — узнайте, где и при каких обстоятельствах родилась строка</p>
+  <div id="map"></div>
+  <div id="card-container"></div>
+</section>
+
+<!-- ===== QUIZ ===== -->
+<section class="quiz">
+  <h2>Испытание на внимательность</h2>
+  <p class="quiz-intro">Десять вопросов — как десять строф оды. Проверьте, удержали ли вы фокус.</p>
+  
+  <div class="quiz-question" data-correct="1">
+    <div class="q-number">I</div>
+    <p>Где Державин писал оду «Властителям и судиям»?</p>
+    <label class="quiz-option">В Петербурге, в Сенате</label>
+    <label class="quiz-option">В Тамбове, в губернаторской канцелярии</label>
+    <label class="quiz-option">В Казани, в гимназии</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="1">
+    <div class="q-number">II</div>
+    <p>Где родилась ода «Памятник»?</p>
+    <label class="quiz-option">В Сенате Петербурга</label>
+    <label class="quiz-option">В усадьбе Званка на Волхове</label>
+    <label class="quiz-option">В Олонецкой губернии</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="0">
+    <div class="q-number">III</div>
+    <p>Какое событие связано с темой оды «Властителям и судиям»?</p>
+    <label class="quiz-option">Дело А. Н. Радищева и борьба с произволом</label>
+    <label class="quiz-option">Полтавская битва</label>
+    <label class="quiz-option">Отмена крепостного права</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="2">
+    <div class="q-number">IV</div>
+    <p>Кому принадлежат строки: «Слух обо мне пройдёт по всей Руси великой»?</p>
+    <label class="quiz-option">А. С. Пушкину</label>
+    <label class="quiz-option">М. В. Ломоносову</label>
+    <label class="quiz-option">Г. Р. Державину</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="0">
+    <div class="q-number">V</div>
+    <p>При какой императрице жил и творил Державин?</p>
+    <label class="quiz-option">Екатерине II</label>
+    <label class="quiz-option">Елизавете Петровне</label>
+    <label class="quiz-option">Анне Иоанновне</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="1">
+    <div class="q-number">VI</div>
+    <p>В каком жанре написаны оды «Памятник» и «Властителям и судиям»?</p>
+    <label class="quiz-option">Сатира</label>
+    <label class="quiz-option">Ода (торжественное стихотворение)</label>
+    <label class="quiz-option">Баллада</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="2">
+    <div class="q-number">VII</div>
+    <p>Какую должность занимал Державин в Олонецкой и Тамбовской губерниях?</p>
+    <label class="quiz-option">Обер-прокурор Сената</label>
+    <label class="quiz-option">Министр просвещения</label>
+    <label class="quiz-option">Губернатор</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="0">
+    <div class="q-number">VIII</div>
+    <p>Какое географическое понятие Державин использует в оде «Памятник»?</p>
+    <label class="quiz-option">«От Белых вод до Чёрных» — всю Россию</label>
+    <label class="quiz-option">«От Москвы до Казани»</label>
+    <label class="quiz-option">«От Невы до Волги»</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="1">
+    <div class="q-number">IX</div>
+    <p>Какое европейское событие повлияло на гражданскую позицию Державина?</p>
+    <label class="quiz-option">Великая французская революция</label>
+    <label class="quiz-option">Реформация Лютера</label>
+    <label class="quiz-option">Восстание Спартака</label>
+  </div>
+  
+  <div class="quiz-question" data-correct="2">
+    <div class="q-number">X</div>
+    <p>На берегу какой реки стояла усадьба Званка?</p>
+    <label class="quiz-option">Нева</label>
+    <label class="quiz-option">Волга</label>
+    <label class="quiz-option">Волхов</label>
+  </div>
+  
+  <div class="quiz-result" id="quiz-result">
+    <div class="result-medallion" id="result-medallion">0</div>
+    <p class="result-text" id="result-text">из 10 правильных ответов</p>
+    <p class="result-comment" id="result-comment"></p>
+  </div>
+  
+  <div style="text-align:center; margin-top: 30px;">
+    <button class="btn" id="check-quiz">Проверить всё</button>
+  </div>
+</section>
+
+<!-- ===== TIMER-GAME ===== -->
+<section class="timer-section">
+  <div class="timer-header">
+    <h2>5 минут с державиным</h2>
+    <div class="timer-score">
+      <div class="score-item">
+        <div class="score-label">УГАДАНО</div>
+        <div class="score-value correct-score" id="correct-score">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">ПРОПУЩЕНО</div>
+        <div class="score-value wrong-score" id="wrong-score">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">ВСЕГО</div>
+        <div class="score-value total-score" id="total-score">0</div>
+      </div>
+    </div>
+  </div>
+  
+  <p class="timer-intro">
+    За 5 минут угадайте, из какого места империи родилась каждая цитата. 
+    Новая цитата появляется каждые 30 секунд.
+  </p>
+  
+  <div class="timer-display" id="timer">05:00</div>
+  
+  <div class="quote-game" id="quote-game" style="display:none;">
+    <div class="quote-display" id="quote-display"></div>
+    <div class="quote-options" id="quote-options"></div>
+    <div class="quote-feedback" id="quote-feedback"></div>
+  </div>
+  
+  <button class="btn" id="start-timer">Начать игру</button>
+</section>
+
+<style>
+  .timer-header {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .timer-header h2 {
+    margin: 0;
+    font-size: 2.5em;
+    text-transform: lowercase;
+    letter-spacing: 0.05em;
+  }
+  .timer-header h2::after { display: none; }
+  .timer-score {
+    display: flex;
+    gap: 20px;
+  }
+  .score-item {
+    text-align: center;
+    background: var(--deep);
+    padding: 10px 20px;
+    border: 2px solid var(--terracotta);
+    min-width: 90px;
+  }
+  .score-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7em;
+    letter-spacing: 0.15em;
+    color: var(--sand);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .score-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2em;
+    font-weight: 600;
+    color: var(--ochre);
+  }
+  .score-value.correct-score { color: #8FB57A; }
+  .score-value.wrong-score { color: var(--terracotta); }
+  
+  .quote-game {
+    max-width: 800px;
+    margin: 30px auto;
+    background: var(--deep);
+    border: 2px solid var(--terracotta);
+    padding: 30px;
+    position: relative;
+  }
+  .quote-display {
+    font-style: italic;
+    font-size: 1.4em;
+    color: var(--white);
+    text-align: center;
+    padding: 20px;
+    border-left: 5px solid var(--terracotta);
+    border-right: 5px solid var(--terracotta);
+    margin-bottom: 25px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
+  }
+  .quote-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+  .quote-option {
+    background: var(--paper);
+    color: var(--ink);
+    padding: 14px 18px;
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    transition: 0.15s;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 1em;
+    font-weight: 700;
+    text-align: center;
+  }
+  .quote-option:hover:not(.disabled) {
+    background: var(--ochre);
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .quote-option.correct {
+    background: #8FB57A;
+    color: var(--white);
+    border-color: var(--ink);
+  }
+  .quote-option.wrong {
+    background: var(--terracotta);
+    color: var(--white);
+    text-decoration: line-through;
+  }
+  .quote-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  .quote-feedback {
+    text-align: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    min-height: 25px;
+    color: var(--ochre);
+  }
+  .quote-feedback.correct-fb { color: #8FB57A; }
+  .quote-feedback.wrong-fb { color: var(--terracotta); }
+  
+  .timer-final {
+    background: var(--white);
+    color: var(--ink);
+    padding: 35px;
+    border: 3px solid var(--terracotta);
+    max-width: 600px;
+    margin: 30px auto 0;
+    text-align: center;
+  }
+  .timer-final h3 {
+    font-size: 1.8em;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    color: var(--terracotta);
+  }
+  .timer-final .final-score {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3em;
+    color: var(--ink);
+    margin: 15px 0;
+  }
+  .timer-final .final-comment {
+    font-style: italic;
+    font-size: 1.1em;
+    color: var(--deep);
+  }
+  
+  @media (max-width: 768px) {
+    .timer-header { flex-direction: column; align-items: flex-start; }
+    .timer-header h2 { font-size: 2em; }
+    .quote-options { grid-template-columns: 1fr; }
+    .timer-score { width: 100%; justify-content: space-between; }
+    .score-item { flex: 1; }
+  }
+</style>
+
+<script>
+// Цитаты с правильными ответами (место создания оды)
+const quoteGame = [
+  {
+    quote: "«Восплещите в вечные скрижали: здесь не суд, не право — насилие!»",
+    options: ["Казань", "Тамбов", "Званка", "Петербург"],
+    correct: 1
+  },
+  {
+    quote: "«Я памятник себе воздвиг чудесный, вечный...»",
+    options: ["Петербург", "Петрозаводск", "Званка", "Тамбов"],
+    correct: 2
+  },
+  {
+    quote: "«Что славен был меж тем в России диких...»",
+    options: ["Тамбов", "Казань", "Званка", "Петербург"],
+    correct: 1
+  },
+  {
+    quote: "«Законы простирайте над собой, служите не себе, а общему благу»",
+    options: ["Званка", "Казань", "Петербург", "Петрозаводск"],
+    correct: 3
+  },
+  {
+    quote: "«Слух обо мне пройдёт по всей Руси великой...»",
+    options: ["Тамбов", "Казань", "Званка", "Петербург"],
+    correct: 2
+  },
+  {
+    quote: "«О вы, которых голос правый свободней ветров и смелей»",
+    options: ["Казань", "Тамбов", "Званка", "Петербург"],
+    correct: 3
+  },
+  {
+    quote: "«Вельможи! не губите правых...»",
+    options: ["Петербург", "Званка", "Казань", "Петрозаводск"],
+    correct: 0
+  },
+  {
+    quote: "«Возьму начало я из глубины сибирских руд...»",
+    options: ["Казань", "Званка", "Петербург", "Тамбов"],
+    correct: 0
+  },
+  {
+    quote: "«Напрасно на вельмож вельможа смотрит косо...»",
+    options: ["Званка", "Петербург", "Казань", "Петрозаводск"],
+    correct: 1
+  },
+  {
+    quote: "«Среди шумных городских сует, в уединении Званки...»",
+    options: ["Тамбов", "Казань", "Петербург", "Званка"],
+    correct: 3
+  }
+];
+
+let timeLeft = 300;
+let timerInterval;
+let quoteInterval;
+let currentQuoteIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let totalCount = 0;
+let answered = false;
+
+function shuffleArray(arr) {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function showQuote() {
+  if (currentQuoteIndex >= quoteGame.length) {
+    currentQuoteIndex = 0;
+  }
+  
+  const q = quoteGame[currentQuoteIndex];
+  document.getElementById('quote-display').textContent = q.quote;
+  
+  const optionsContainer = document.getElementById('quote-options');
+  optionsContainer.innerHTML = '';
+  
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'quote-option';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => handleAnswer(i, q.correct, btn));
+    optionsContainer.appendChild(btn);
+  });
+  
+  document.getElementById('quote-feedback').textContent = '';
+  document.getElementById('quote-feedback').className = 'quote-feedback';
+  answered = false;
+  currentQuoteIndex++;
+}
+
+function handleAnswer(selected, correct, btn) {
+  if (answered) return;
+  answered = true;
+  totalCount++;
+  
+  const options = document.querySelectorAll('.quote-option');
+  options.forEach(o => o.classList.add('disabled'));
+  
+  const feedback = document.getElementById('quote-feedback');
+  
+  if (selected === correct) {
+    correctCount++;
+    btn.classList.add('correct');
+    feedback.textContent = '✓ ВЕРНО';
+    feedback.className = 'quote-feedback correct-fb';
+  } else {
+    wrongCount++;
+    btn.classList.add('wrong');
+    options[correct].classList.add('correct');
+    feedback.textContent = '✗ НЕВЕРНО';
+    feedback.className = 'quote-feedback wrong-fb';
+  }
+  
+  document.getElementById('correct-score').textContent = correctCount;
+  document.getElementById('wrong-score').textContent = wrongCount;
+  document.getElementById('total-score').textContent = totalCount;
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  clearInterval(quoteInterval);
+  
+  const gameBlock = document.getElementById('quote-game');
+  gameBlock.style.display = 'none';
+  
+  // Создаём финальный блок
+  const existing = document.querySelector('.timer-final');
+  if (existing) existing.remove();
+  
+  const final = document.createElement('div');
+  final.className = 'timer-final';
+  
+  let comment = '';
+  const percent = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+  
+  if (percent >= 80) {
+    comment = 'Превосходно! Вы — истинный знаток Державина. Поэт был бы доволен.';
+  } else if (percent >= 60) {
+    comment = 'Хороший результат. Вы уверенно ориентируетесь в географии од.';
+  } else if (percent >= 40) {
+    comment = 'Неплохо, но есть куда расти. Вернитесь к карте империи.';
+  } else {
+    comment = 'Классика требует внимания. Пройдите карту ещё раз.';
+  }
+  
+  final.innerHTML = `
+    <h3>Игра окончена</h3>
+    <div class="final-score">${correctCount} из ${totalCount}</div>
+    <p class="final-comment">${comment}</p>
+  `;
+  
+  document.querySelector('.timer-section').appendChild(final);
+}
+
+document.getElementById('start-timer').addEventListener('click', () => {
+  if (timerInterval) return;
+  
+  // Сброс
+  timeLeft = 300;
+  correctCount = 0;
+  wrongCount = 0;
+  totalCount = 0;
+  currentQuoteIndex = 0;
+  
+  document.getElementById('correct-score').textContent = '0';
+  document.getElementById('wrong-score').textContent = '0';
+  document.getElementById('total-score').textContent = '0';
+  
+  const final = document.querySelector('.timer-final');
+  if (final) final.remove();
+  
+  document.getElementById('quote-game').style.display = 'block';
+  document.getElementById('start-timer').style.display = 'none';
+  
+  showQuote();
+  
+  // Новая цитата каждые 30 секунд
+  quoteInterval = setInterval(() => {
+    if (!answered) {
+      wrongCount++;
+      totalCount++;
+      document.getElementById('wrong-score').textContent = wrongCount;
+      document.getElementById('total-score').textContent = totalCount;
+      
+      const feedback = document.getElementById('quote-feedback');
+      feedback.textContent = '⏱ ВРЕМЯ ВЫШЛО';
+      feedback.className = 'quote-feedback wrong-fb';
+      
+      const options = document.querySelectorAll('.quote-option');
+      const q = quoteGame[currentQuoteIndex - 1];
+      options.forEach(o => o.classList.add('disabled'));
+      options[q.correct].classList.add('correct');
+      answered = true;
+    }
+    showQuote();
+  }, 30000);
+  
+  // Таймер
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timer').textContent =
+      `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+});
+</script>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <h3>География Слова</h3>
+  <p>Индивидуальный проект · MMXXVI</p>
+  <p>Источники: Г. Р. Державин. Сочинения · Я. Грот. Жизнь Державина</p>
+  <p class="subjects">Литература · История · География · Информатика</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const points = [
+  {
+    name: "Казань",
+    coords: [55.7887, 49.1221],
+    year: "1743–1760-е",
+    story: "Молодой Гаврила учится в Казанской гимназии. Многонациональное Поволжье формирует его взгляд на Россию как на огромную многоукладную страну.",
+    quote: "«Что славен был меж тем в России диких...»",
+    ode: "Памятник"
+  },
+  {
+    name: "Тамбов",
+    coords: [52.7212, 41.4523],
+    year: "1786–1788",
+    story: "Державин — тамбовский губернатор. Борется с казнокрадством и произволом, за что получает выговор от Екатерины II. Этот опыт — прямой источник оды.",
+    quote: "«Восплещите в вечные скрижали: здесь не суд, не право — насилие!»",
+    ode: "Властителям и судиям"
+  },
+  {
+    name: "Петрозаводск",
+    coords: [61.7849, 34.3469],
+    year: "1784–1785",
+    story: "Державин — олонецкий губернатор. Видит своими глазами жизнь северных губерний, проблемы чиновничьего произвола.",
+    quote: "«Законы простирайте над собой, / Служите не себе, а общему благу»",
+    ode: "Властителям и судиям"
+  },
+  {
+    name: "Санкт-Петербург",
+    coords: [59.9343, 30.3351],
+    year: "1790-е",
+    story: "Обер-прокурор Сената. Эпоха французской революции, дело Радищева. Державин понимает: слово поэта может быть страшнее указа.",
+    quote: "«О вы, которых голос правый / Свободней ветров и смелей»",
+    ode: "Властителям и судиям"
+  },
+  {
+    name: "Усадьба Званка",
+    coords: [58.45, 32.55],
+    year: "1795–1816",
+    story: "Отставка на берегу Волхова. Здесь, в тишине, Державин подводит итог жизни и создаёт оду-завещание — «Памятник».",
+    quote: "«Я памятник себе воздвиг чудесный, вечный... / Слух обо мне пройдёт по всей Руси великой»",
+    ode: "Памятник"
+  }
+];
+
+const map = L.map('map').setView([57, 38], 4);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '© Esri',
+  maxZoom: 8
+}).addTo(map);
+
+const container = document.getElementById('card-container');
+
+points.forEach((p) => {
+  const icon = L.divIcon({
+    className: 'constructivist-marker',
+    html: `<div style="
+      width:30px;height:30px;
+      background:#C84630;
+      border:3px solid #2B3A4A;
+      transform:rotate(45deg);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:2px 2px 0 #2B3A4A;
+    "><div style="transform:rotate(-45deg);color:#FAF7F0;font-weight:bold;font-size:14px;">◆</div></div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+  const marker = L.marker(p.coords, {icon}).addTo(map);
+  marker.bindPopup(`<b>${p.name}</b><br><i>${p.year}</i><br>Ода: «${p.ode}»`);
+  marker.on('click', () => {
+    container.innerHTML = `
+      <div class="card active">
+        <h3>${p.name}</h3>
+        <div class="year">${p.year} · Ода «${p.ode}»</div>
+        <div class="label">Исторический контекст</div>
+        <p class="story">${p.story}</p>
+        <div class="quote">${p.quote}</div>
+        <div class="task">
+          <b>Задание на внимательность</b>
+          Найдите в тексте оды «${p.ode}» ещё одну-две строки, которые могли родиться именно в этом месте.
+        </div>
+      </div>
+    `;
+    container.scrollIntoView({behavior: 'smooth', block: 'center'});
+  });
+});
+
+// Quiz
+document.querySelectorAll('.quiz-question').forEach(q => {
+  const correct = parseInt(q.dataset.correct);
+  const options = q.querySelectorAll('.quiz-option');
+  options.forEach((opt, i) => {
+    opt.addEventListener('click', () => {
+      options.forEach(o => o.classList.remove('correct', 'wrong'));
+      if (i === correct) opt.classList.add('correct');
+      else {
+        opt.classList.add('wrong');
+        options[correct].classList.add('correct');
+      }
+    });
+  });
+});
+
+// Check quiz
+document.getElementById('check-quiz').addEventListener('click', () => {
+  const questions = document.querySelectorAll('.quiz-question');
+  let correctCount = 0;
+  
+  questions.forEach(q => {
+    const correct = parseInt(q.dataset.correct);
+    const options = q.querySelectorAll('.quiz-option');
+    const selectedCorrect = options[correct].classList.contains('correct');
+    if (selectedCorrect) correctCount++;
+  });
+  
+  const resultBlock = document.getElementById('quiz-result');
+  const medallion = document.getElementById('result-medallion');
+  const comment = document.getElementById('result-comment');
+  
+  medallion.textContent = correctCount;
+  
+  let commentText = '';
+  if (correctCount === 10) {
+    commentText = 'Превосходно! Вы — истинный знаток Державина. Поэт был бы доволен.';
+  } else if (correctCount >= 7) {
+    commentText = 'Отличный результат. Вы уверенно ориентируетесь в географии и истории од.';
+  } else if (correctCount >= 4) {
+    commentText = 'Неплохо, но есть куда расти. Вернитесь к карте империи и перечитайте оды.';
+  } else {
+    commentText = 'Классика требует внимания. Пройдите карту ещё раз — и попробуйте снова.';
+  }
+  
+  comment.textContent = commentText;
+  resultBlock.style.display = 'block';
+  resultBlock.scrollIntoView({behavior: 'smooth', block: 'center'});
+});
+
+// Timer
+const quotes = [
+  "«Властители и судии! Законы простирайте над собой...»",
+  "«Я памятник себе воздвиг чудесный, вечный...»",
+  "«Слух обо мне пройдёт по всей Руси великой...»",
+  "«Вельможи! не губите правых...»"
+];
+let timeLeft = 300;
+let timerInterval;
+let quoteIndex = 0;
+
+document.getElementById('start-timer').addEventListener('click', () => {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timer').textContent =
+      `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    if (timeLeft % 90 === 0 && timeLeft > 0) {
+      quoteIndex = (quoteIndex + 1) % quotes.length;
+      document.getElementById('timer-quote').textContent = quotes[quoteIndex];
+    }
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('timer-quote').textContent = "✦ Время истекло. Вы удержали фокус пять минут. ✦";
+    }
+  }, 1000);
+});
+</script>
+</body>
+</html>
